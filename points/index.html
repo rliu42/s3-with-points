@@ -1,0 +1,154 @@
+<html>
+
+<head>
+    <title>Safetythird with Points</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Ubuntu' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="css/main.css" media="screen">
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.0/angular-material.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script src="https://momentjs.com/downloads/moment.js"></script>
+    <script src="https://momentjs.com/downloads/moment-timezone.js"></script>
+    <script src="https://momentjs.com/downloads/moment-timezone-with-data-2012-2022.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-animate.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-aria.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-messages.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.0/angular-material.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.0/Chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/angular-chart.js@1.1.1/dist/angular-chart.min.js"></script>
+    <script src="js/app.js"></script>
+</head>
+<style>
+body {
+    font-family: Ubuntu;
+    margin: 12px;
+}
+
+h1 {
+    background-color: orange;
+    max-width: 600px;
+    padding: 4px;
+}
+
+td,
+th {
+    text-align: center;
+}
+
+.leaderboard tbody tr:hover {
+    background-color: orange;
+    color: white;
+    cursor: pointer;
+    font-weight: 700;
+}
+
+.mail-item {
+    color: #666;
+    list-style: none;
+}
+
+.timestamp {
+    color: #666;
+    background-color: #ccc;
+}
+
+.email-listing {
+    position: fixed;
+    top: 24;
+    left: 60%;
+}
+
+@media only screen and (max-width: 960px) {
+    .email-listing {
+        display: none;
+    }
+}
+</style>
+
+<body ng-app="pointsApp" ng-controller="MainController" ng-cloak>
+    <h1>safetythird with points</h1>
+    <h3>+5 points for every email to safetythird or who-said-it<br><small>(other aliases of safetythird@mit.edu not counted yet)</small></h3>
+    <h3>+1 bonus point for number of emails in the same thread</h2>
+
+<table style="border: solid 1px;">
+        <thead>
+            <tr>
+                <th>Last Update</th>
+                <th>Logging Since</th>
+                <th>&nbsp;Emails counted&nbsp;</th>
+                <th>Emails/day</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td ng-show="lastUpdate">
+                    &nbsp; {{lastUpdate}} &nbsp;
+                </td>
+                <td ng-show="loggingDays">
+                    {{loggingSince}} <small> ({{loggingDays}} days) </small>
+                </td>
+                <td>
+                    {{mail.length}}
+                </td>
+                <td ng-show="loggingDays && mail.length">
+                    {{(mail.length/loggingDays).toFixed(2)}}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+<br>
+<div class="container">
+    <div class="leaderboard" ng-show="leaderboard.length">
+        <table>
+            <thead>
+                <tr>
+                    <th>Rank</th>
+                    <th>User</th>
+                    <th>&nbsp;Points&nbsp;</th>
+                    <th>&nbsp;Last active&nbsp;</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="row in leaderboard" ng-mouseover="hover(row)">
+                    <td>
+                        {{$index + 1}}
+                    </td>
+                    <td>
+                        {{row.user}}
+                    </td>
+                    <td>
+                        {{row.points}}
+                    </td>
+                    <td>
+                        {{row.lastActive | date : 'M/dd/yy'}}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="email-listing">
+        <h3 ng-show="selected.user">{{filterStats.emails}} emails from <span style="background-color:#666; color:white; padding:4px">{{selected.user}}</span> <small>({{filterStats.threads}} threads participated)</small></h3>
+    <li ng-repeat="item in filterMail" class="mail-item">
+        {{item.subject}} <small class="timestamp">{{item.timestamp | date: 'M/dd/yyyy @ h:mma'}}</small>
+    </li>
+    </div>
+    </div>
+</body>
+<script>
+(function(i, s, o, g, r, a, m) {
+    i['GoogleAnalyticsObject'] = r;
+    i[r] = i[r] || function() {
+        (i[r].q = i[r].q || []).push(arguments)
+    }, i[r].l = 1 * new Date();
+    a = s.createElement(o),
+        m = s.getElementsByTagName(o)[0];
+    a.async = 1;
+    a.src = g;
+    m.parentNode.insertBefore(a, m)
+})(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
+ga('create', 'UA-53444065-4', 'auto');
+ga('send', 'pageview');
+</script>
+
+</html>
