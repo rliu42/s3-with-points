@@ -27,8 +27,28 @@ body {
 
 h1 {
     background-color: orange;
-    max-width: 600px;
+    max-width: 500px;
     padding: 4px;
+}
+
+thead th {
+    background-color: #aaa;
+}
+
+table#class_totals {
+    margin-top: -8px;
+}
+
+table#class_totals thead th {
+    background-color: orange;
+}
+
+table#class_totals tbody {
+    background-color: #aaa;
+}
+
+table#class_totals tbody td {
+    width: 48px;
 }
 
 td,
@@ -53,87 +73,130 @@ th {
     background-color: #ccc;
 }
 
-.email-listing {
-    position: fixed;
-    top: 24;
+.left {
+    position: absolute;
+    top: 12;
     left: 60%;
+    overflow: auto;
 }
 
 @media only screen and (max-width: 960px) {
-    .email-listing {
+    .left {
         display: none;
     }
 }
 </style>
 
-<body ng-app="pointsApp" ng-controller="MainController" ng-cloak>
-    <h1>safetythird with points</h1>
-    <h3>+5 points for every email to safetythird or who-said-it<br><small>(other aliases of safetythird@mit.edu not counted yet)</small></h3>
-    <h3>+1 bonus point for number of emails in the same thread</h2>
-
+<body ng-app="pointsApp" ng-controller="MainController as ctrl" ng-cloak>
+<h1>safetythird with points!</h1>
+<h3>+5 points for every email to <i>safetythird</i> or <i>who-said-it</i><br><small>(other aliases of safetythird@mit.edu are not counted yet)</small></h3>
+<h3>+1 bonus point for number of emails in the same thread</h2>
 <table style="border: solid 1px;">
+    <thead>
+        <tr>
+            <th>Last update</th>
+            <th>Logging since</th>
+            <th>&nbsp;Emails counted&nbsp;</th>
+            <th>&nbsp;Emails/day&nbsp;</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td ng-show="loggingDays">
+                &nbsp; Today, {{lastUpdate | date: 'h:mma'}} &nbsp;
+            </td>
+            <td ng-show="loggingDays">
+                {{loggingSince | date: 'MMM dd, yyyy'}} <small> ({{loggingDays}} days) </small>
+            </td>
+            <td>
+                {{mail.length || 'Loading..'}}
+            </td>
+            <td ng-show="loggingDays && mail.length">
+                {{(mail.length/loggingDays).toFixed(2)}}
+            </td>
+        </tr>
+    </tbody>
+</table>
+<p ng-if="leaderboard">by <b>Class Year</b></p>
+<table id="class_totals" ng-if="leaderboard">
+    <thead>
+        <tr>
+            <th ng-repeat="y in class_years">{{y}}</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td ng-repeat="y in class_years">
+                {{class_totals[y].points || 0}}
+            </td>
+        </tr>
+    </tbody>
+</table>
+<br>
+<div ng-if="!leaderboard || !leaderboard[selected_view]">
+    Loading..
+</div>
+<form ng-show="leaderboard">
+    <label>
+        <input type="radio" ng-model="selected_view" value="by_email"> by <b>Email address</b>
+    </label>
+    <label>
+        <input type="radio" ng-model="selected_view" value="by_name"> by <b>Name</b>
+    </label>
+</form>
+<div class="leaderboard" ng-show="leaderboard && leaderboard[selected_view]">
+    <table>
         <thead>
             <tr>
-                <th>Last Update</th>
-                <th>Logging Since</th>
-                <th>&nbsp;Emails counted&nbsp;</th>
-                <th>Emails/day</th>
+                <th>&nbsp;Rank&nbsp;</th>
+                <th>User</th>
+                <th>&nbsp;Points&nbsp;</th>
+                <th>&nbsp;Class Year&nbsp;</th>
+                <th>&nbsp;Last active&nbsp;</th>
+                <th ng-show="selected_view=='by_name'">Edit Class Year</th>
             </tr>
         </thead>
         <tbody>
-            <tr>
-                <td ng-show="lastUpdate">
-                    &nbsp; {{lastUpdate}} &nbsp;
-                </td>
-                <td ng-show="loggingDays">
-                    {{loggingSince}} <small> ({{loggingDays}} days) </small>
+            <tr ng-repeat="row in leaderboard[selected_view]" ng-mouseover="hover(row)">
+                <td>
+                    {{$index + 1}}
                 </td>
                 <td>
-                    {{mail.length}}
+                    {{row.user}}
                 </td>
-                <td ng-show="loggingDays && mail.length">
-                    {{(mail.length/loggingDays).toFixed(2)}}
+                <td>
+                    {{row.points}}
+                </td>
+                <td>
+                    {{row.year || ""}}
+                </td>
+                <td>
+                    {{row.lastActive | date : 'M/dd/yy'}}
+                </td>
+                <td ng-show="selected_view == 'by_name'">
+                    <select ng-model="row.year" ng-change="saveClassYear(row)">
+                        <option style="font-family:Ubuntu" ng-repeat="y in class_years" value="{{y}}">
+                            {{y}}
+                        </option>
+                    </select>
                 </td>
             </tr>
         </tbody>
     </table>
-<br>
-<div class="container">
-    <div class="leaderboard" ng-show="leaderboard.length">
-        <table>
-            <thead>
-                <tr>
-                    <th>Rank</th>
-                    <th>User</th>
-                    <th>&nbsp;Points&nbsp;</th>
-                    <th>&nbsp;Last active&nbsp;</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr ng-repeat="row in leaderboard" ng-mouseover="hover(row)">
-                    <td>
-                        {{$index + 1}}
-                    </td>
-                    <td>
-                        {{row.user}}
-                    </td>
-                    <td>
-                        {{row.points}}
-                    </td>
-                    <td>
-                        {{row.lastActive | date : 'M/dd/yy'}}
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-    <div class="email-listing">
-        <h3 ng-show="selected.user">{{filterStats.emails}} emails from <span style="background-color:#666; color:white; padding:4px">{{selected.user}}</span> <small>({{filterStats.threads}} threads participated)</small></h3>
-    <li ng-repeat="item in filterMail" class="mail-item">
+</div>
+<div class="left">
+<section id="chart-container" ng-controller="ChartController">
+    <div ng-if="!leaderboard">Loading..</div>
+    <canvas class="chart chart-line" chart-data="chart_data" chart-options="options" chart-dataset-override="datasetOverride" chart-colors="colors">
+    </canvas>
+</section>
+<div class="email-listing">
+    <h3 ng-show="selected.user">{{filterMail.length}} emails from <span style="background-color:#666; color:white; padding:4px">{{selected.user}}</span> <small>(participated in {{filterMailSubjects.length}} threads)</small></h3>
+    <li ng-repeat="item in filterMailSubjects" class="mail-item">
         {{item.subject}} <small class="timestamp">{{item.timestamp | date: 'M/dd/yyyy @ h:mma'}}</small>
     </li>
-    </div>
-    </div>
+</div>
+</div>
 </body>
 <script>
 (function(i, s, o, g, r, a, m) {
