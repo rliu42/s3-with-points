@@ -80,14 +80,14 @@ var tally = function(mail) {
     var sender = processAddressObject(mail.from[0]);
     if (sender.address) {
         tallyRef.child(sender.address).once("value", function(ss) {
-            var _record = ss.val() || { points: 0 };
+            var _record = ss.val() || { points: 0};
             _record.points += SEND_MAIL_POINTS;
             tallyRef.child(sender.address).update(_record);
         });
     }
     if (sender.name && sender.name !== sender.address) {
         tallyRef.child(sender.name).once("value", function(ss) {
-            var _record = ss.val() || { points: 0 };
+            var _record = ss.val() || { points: 0, name: true};
             _record.points += SEND_MAIL_POINTS;
             tallyRef.child(sender.name).update(_record);
         });
@@ -105,7 +105,7 @@ var tally = function(mail) {
         }
         if (user.name && user.name !== user.address) {
             tallyRef.child(user.name).once("value", function(ss) {
-                var _record = ss.val() || { points: 0 };
+                var _record = ss.val() || { points: 0, name: true};
                 _record.points += SEND_MAIL_POINTS;
                 tallyRef.child(user.name).update(_record);
             });

@@ -9,43 +9,47 @@ var mailRef = app_root.child("mail");
 var nameLookupRef = app_root.child("nameLookup");
 var yearLookupRef = app_root.child("yearLookup");
 
+var tallyCache = {};
+tallyRef.on("value", function(ss) {
+    tallyCache = ss.val();
+});
 // GET /api/leaderboard
 router.get('/leaderboard', function(req, res) {
-    tallyRef.once("value", function(ss) {
-        var leaderboard = { by_name: [], by_email: [] };
-        Object.keys(ss.val() || {}).forEach(function(k) {
-            var record = ss.val()[k];
-            record.user = k;
-            if (record.name) {
-                delete record.name;
-                leaderboard.by_name.push(record);
-            } else {
-                leaderboard.by_email.push(record);
-            }
-        });
-        Object.keys(leaderboard).forEach(function(k) {
-            leaderboard[k] = leaderboard[k].filter(function(record) {
-                return record.points >= 5;
-            });
-            leaderboard[k].sort(function(a, b) {
-                return b.points - a.points;
-            });
-        });
-        res.json(leaderboard);
+    var leaderboard = { by_name: [], by_email: [] };
+    Object.keys(tallyCache).forEach(function(k) {
+        var record = tallyCache[k];
+        record.user = k;
+        if (record.name) {
+            delete record.name;
+            leaderboard.by_name.push(record);
+        } else {
+            leaderboard.by_email.push(record);
+        }
     });
+    Object.keys(leaderboard).forEach(function(k) {
+        leaderboard[k] = leaderboard[k].filter(function(record) {
+            return record.points >= 5;
+        });
+        leaderboard[k].sort(function(a, b) {
+            return b.points - a.points;
+        });
+    });
+    res.json(leaderboard);
 });
 
+var mailCache = [];
+mailRef.on("value", function(ss) {
+    mailCache = ss.val();
+});
 // GET /api/mail?user=
 router.get('/mail', function(req, res) {
     var user = req.query.user || "";
-    mailRef.once("value", function(ss) {
-        var ret = (ss.val() || []).filter(function(mail) {
-            return user ? mail.from[0].address.indexOf(user) > -1 : true;
-        }).sort(function(a, b) {
-            return (b.timestamp || 0) - (a.timestamp || 0);
-        });
-        res.json(ret);
+    var ret = cache.filter(function(mail) {
+        return user ? mail.from[0].address.indexOf(user) > -1 : true;
+    }).sort(function(a, b) {
+        return (b.timestamp || 0) - (a.timestamp || 0);
     });
+    res.json(ret);
 });
 
 // GET /api/lookup_tables
