@@ -1,0 +1,6 @@
+{
+	"SEND_MAIL_POINTS": 3,
+	"REPLY_BONUS_POINTS": 1,
+	"MAILING_LISTS": ["safetythird@mit.edu", "who-said-it-in-safetythird@mit.edu", "thad-ideas@mit.edu"],
+	"PENALTY_WORDS": []
+}

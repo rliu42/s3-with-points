@@ -1,10 +1,7 @@
 var fs = require('fs'),
-    config = require('./config'),
     express = require('express'),
     http = require('http'),
     path = require('path'),
-    Firebase = require('firebase'),
-    listener = require('./listener'),
     morgan = require('morgan'),
     compress = require('compression'),
     methodOverride = require('method-override'),
@@ -30,6 +27,7 @@ app.use(bodyParser.json());
 app.use(methodOverride());
 app.use(cookieParser());
 app.use(flash());
+app.use(morgan('dev'));
 app.use(helmet.frameguard());
 app.use(helmet.xssFilter());
 app.use(helmet.noSniff());

@@ -1,0 +1,75 @@
+body {
+    font-family: Ubuntu;
+    margin: 12px !important;
+}
+
+h1 {
+    background-color: orange;
+    max-width: 600px;
+    padding: 4px;
+}
+
+thead th {
+    background-color: #aaa;
+}
+
+table#class_totals {
+    margin-top: -8px;
+}
+
+table#class_totals thead th {
+    background-color: orange;
+}
+
+table#class_totals tbody {
+    background-color: #aaa;
+}
+
+table#class_totals tbody td {
+    width: 48px;
+}
+
+td,
+th {
+    text-align: center;
+    padding: 3px;
+}
+
+.leaderboard tbody tr:hover {
+    background-color: orange;
+    color: white;
+    cursor: pointer;
+    font-weight: 700;
+}
+
+.mail-item {
+    color: #666;
+    list-style: none;
+}
+
+.timestamp {
+    color: #666;
+    background-color: #ccc;
+}
+
+.left {
+    position: absolute;
+    top: 12;
+    left: 60%;
+    overflow: auto;
+}
+
+i {
+    font-family: Consolas, monospace;
+}
+
+i.light {
+    font-weight: normal;
+    opacity: 0.5;
+}
+
+@media only screen and (max-width: 960px) {
+    .left {
+        display: none;
+    }
+}

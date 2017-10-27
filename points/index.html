@@ -19,184 +19,122 @@
     <script src="https://cdn.jsdelivr.net/npm/angular-chart.js@1.1.1/dist/angular-chart.min.js"></script>
     <script src="js/app.js"></script>
 </head>
-<style>
-body {
-    font-family: Ubuntu;
-    margin: 12px;
-}
-
-h1 {
-    background-color: orange;
-    max-width: 500px;
-    padding: 4px;
-}
-
-thead th {
-    background-color: #aaa;
-}
-
-table#class_totals {
-    margin-top: -8px;
-}
-
-table#class_totals thead th {
-    background-color: orange;
-}
-
-table#class_totals tbody {
-    background-color: #aaa;
-}
-
-table#class_totals tbody td {
-    width: 48px;
-}
-
-td,
-th {
-    text-align: center;
-}
-
-.leaderboard tbody tr:hover {
-    background-color: orange;
-    color: white;
-    cursor: pointer;
-    font-weight: 700;
-}
-
-.mail-item {
-    color: #666;
-    list-style: none;
-}
-
-.timestamp {
-    color: #666;
-    background-color: #ccc;
-}
-
-.left {
-    position: absolute;
-    top: 12;
-    left: 60%;
-    overflow: auto;
-}
-
-@media only screen and (max-width: 960px) {
-    .left {
-        display: none;
-    }
-}
-</style>
-
 <body ng-app="pointsApp" ng-controller="MainController as ctrl" ng-cloak>
-<h1>safetythird with points!</h1>
-<h3>+5 points for every email to <i>safetythird</i> or <i>who-said-it</i><br><small>(other aliases of safetythird@mit.edu are not counted yet)</small></h3>
-<h3>+1 bonus point for number of emails in the same thread</h2>
-<table style="border: solid 1px;">
-    <thead>
-        <tr>
-            <th>Last update</th>
-            <th>Logging since</th>
-            <th>&nbsp;Emails counted&nbsp;</th>
-            <th>&nbsp;Emails/day&nbsp;</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td ng-show="loggingDays">
-                &nbsp; Today, {{lastUpdate | date: 'h:mma'}} &nbsp;
-            </td>
-            <td ng-show="loggingDays">
-                {{loggingSince | date: 'MMM dd, yyyy'}} <small> ({{loggingDays}} days) </small>
-            </td>
-            <td>
-                {{mail.length || 'Loading..'}}
-            </td>
-            <td ng-show="loggingDays && mail.length">
-                {{(mail.length/loggingDays).toFixed(2)}}
-            </td>
-        </tr>
-    </tbody>
-</table>
-<p ng-if="leaderboard">by <b>Class Year</b></p>
-<table id="class_totals" ng-if="leaderboard">
-    <thead>
-        <tr>
-            <th ng-repeat="y in class_years">{{y}}</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td ng-repeat="y in class_years">
-                {{class_totals[y].points || 0}}
-            </td>
-        </tr>
-    </tbody>
-</table>
-<br>
-<div ng-if="!leaderboard || !leaderboard[selected_view]">
-    Loading..
-</div>
-<form ng-show="leaderboard">
-    <label>
-        <input type="radio" ng-model="selected_view" value="by_email"> by <b>Email address</b>
-    </label>
-    <label>
-        <input type="radio" ng-model="selected_view" value="by_name"> by <b>Name</b>
-    </label>
-</form>
-<div class="leaderboard" ng-show="leaderboard && leaderboard[selected_view]">
-    <table>
+    <h1>safetythird with points!</h1>
+    <table style="border: solid 1px;">
         <thead>
             <tr>
-                <th>&nbsp;Rank&nbsp;</th>
-                <th>User</th>
-                <th>&nbsp;Points&nbsp;</th>
-                <th>&nbsp;Class Year&nbsp;</th>
-                <th>&nbsp;Last active&nbsp;</th>
-                <th ng-show="selected_view=='by_name'">Edit Class Year</th>
+                <th>Last update</th>
+                <th>Logging since</th>
+                <th>&nbsp;Emails counted&nbsp;</th>
+                <th>&nbsp;Emails/day&nbsp;</th>
             </tr>
         </thead>
         <tbody>
-            <tr ng-repeat="row in leaderboard[selected_view]" ng-mouseover="hover(row)">
-                <td>
-                    {{$index + 1}}
+            <tr>
+                <td ng-show="loggingDays">
+                    &nbsp; Today, {{lastUpdate | date: 'h:mma'}} &nbsp;
+                </td>
+                <td ng-show="loggingDays">
+                    {{loggingSince | date: 'MMM dd, yyyy'}} <small> ({{loggingDays}} days) </small>
                 </td>
                 <td>
-                    {{row.user}}
+                    {{mail.length || 'Loading..'}}
                 </td>
-                <td>
-                    {{row.points}}
-                </td>
-                <td>
-                    {{row.year || ""}}
-                </td>
-                <td>
-                    {{row.lastActive | date : 'M/dd/yy'}}
-                </td>
-                <td ng-show="selected_view == 'by_name'">
-                    <select ng-model="row.year" ng-change="saveClassYear(row)">
-                        <option style="font-family:Ubuntu" ng-repeat="y in class_years" value="{{y}}">
-                            {{y}}
-                        </option>
-                    </select>
+                <td ng-show="loggingDays && mail.length">
+                    {{(mail.length/loggingDays).toFixed(2)}}
                 </td>
             </tr>
         </tbody>
     </table>
-</div>
-<div class="left">
-<section id="chart-container" ng-controller="ChartController">
-    <div ng-if="!leaderboard">Loading..</div>
-    <canvas class="chart chart-line" chart-data="chart_data" chart-options="options" chart-dataset-override="datasetOverride" chart-colors="colors">
-    </canvas>
-</section>
-<div class="email-listing">
-    <h3 ng-show="selected.user">{{filterMail.length}} emails from <span style="background-color:#666; color:white; padding:4px">{{selected.user}}</span> <small>(participated in {{filterMailSubjects.length}} threads)</small></h3>
-    <li ng-repeat="item in filterMailSubjects" class="mail-item">
-        {{item.subject}} <small class="timestamp">{{item.timestamp | date: 'M/dd/yyyy @ h:mma'}}</small>
-    </li>
-</div>
-</div>
+    <p><b>+3 points</b> for every email to/in-reply-to these lists:</p>
+    <!--<i>safetythird</i>, <i>who-said-it</i>, <i>thad-ideas</i>-->
+    <form style="margin-top:4px; margin-bottom:4px">
+        <md-checkbox ng-repeat="list in candidate_lists" ng-disabled="pending || !leaderboard || !mail" ng-model="list_opts[list]" aria-label="{{list}}@mit.edu" ng-change="reloadLeaderboard()">
+            <span style="font-family:monospace; font-weight:bold; margin-left:-2px; margin-top:-4px">{{list}}@mit.edu</span>
+        </md-checkbox>
+    </form>
+    <small>(other aliases of <b><i>safetythird@mit.edu</i></b> are not yet counted)</small>
+    <p><b>+1 bonus point</b> for each additional email in a thread after yours</p>
+    <p><b>-1 penalty</b> if email contains any of these words: <i>TBD</i></p>
+    <p ng-if="leaderboard">&nbsp;<b>Class Year</b> totals</p>
+    <table id="class_totals" ng-if="leaderboard">
+        <thead>
+            <tr>
+                <th ng-repeat="y in class_years">{{y}}</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td ng-repeat="y in class_years">
+                    {{class_totals[y].points || 0}}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <br>
+    <div ng-if="!leaderboard || !leaderboard[selected_view]">
+        Loading..
+    </div>
+    <form ng-show="leaderboard">
+        <md-radio-group layout="row" ng-model="selected_view">
+            <md-radio-button value="by_email">by <b>Email address</b></md-radio-button>
+            <md-radio-button value="by_name">by <b>Name</b></md-radio-button>
+        </md-radio-group>
+    </form>
+    <div class="leaderboard" ng-show="leaderboard && leaderboard[selected_view]">
+        <table>
+            <thead>
+                <tr>
+                    <th>&nbsp;Rank&nbsp;</th>
+                    <th>User</th>
+                    <th>&nbsp;Points&nbsp;</th>
+                    <th>&nbsp;Class Year&nbsp;</th>
+                    <th>&nbsp;Last active&nbsp;</th>
+                    <th ng-show="selected_view=='by_name'">&nbsp;Edit Class Year&nbsp;</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="row in leaderboard[selected_view]" ng-mouseover="hover(row)">
+                    <td>
+                        {{$index + 1}}
+                    </td>
+                    <td>
+                        {{row.user}}
+                    </td>
+                    <td>
+                        {{row.points}}
+                    </td>
+                    <td>
+                        {{row.year || ""}}
+                    </td>
+                    <td>
+                        {{row.lastActive | date : 'M/dd/yy'}}
+                    </td>
+                    <td ng-show="selected_view == 'by_name'">
+                        <select ng-model="row.year" ng-change="saveClassYear(row)">
+                            <option style="font-family:Ubuntu" ng-repeat="y in class_years" value="{{y}}">
+                                {{y}}
+                            </option>
+                        </select>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="left" ng-show="!is_mobile">
+        <section id="chart-container" ng-controller="ChartController">
+            <div ng-if="!leaderboard || !chart_data || !mail">Loading..</div>
+            <canvas class="chart chart-line" chart-data="chart_data" chart-options="options" chart-dataset-override="datasetOverride" chart-colors="colors">
+            </canvas>
+        </section>
+        <div class="email-listing">
+            <h3 ng-show="selected.user">{{filter_user_mail.length}} email{{filter_user_mail.length == 1 ? "" : "s"}} from <span style="background-color:#666; color:white; padding:4px; margin-bottom:6px">{{selected.user}}</span> <small> to selected list(s)<br>(participated in {{filterMailSubjects.length}} thread{{filterMailSubjects.length == 1 ? "" : "s"}})</small></h3>
+            <li ng-repeat="item in filterMailSubjects | limitTo: 100 | orderBy: '-timestamp'" class="mail-item">
+                {{item.subject}} <small class="timestamp">{{item.timestamp | date: 'M/dd/yyyy @ h:mma' }}</small>
+            </li>
+        </div>
+    </div>
 </body>
 <script>
 (function(i, s, o, g, r, a, m) {

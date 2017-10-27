@@ -1,5 +1,6 @@
 var MailListener = require('mail-listener2'),
     config = require('./config'),
+    constants = require('./constants'),
     logger = require('./logger')
 
 var mailListener = new MailListener({
@@ -22,7 +23,10 @@ var mailListener = new MailListener({
 
 var is_safetythird = function(mail) {
     var contains_safetythird = function(rcp) {
-        return /safetythird\@mit\.edu/i.test(rcp.address);
+        var matched = constants.MAILING_LISTS.find(function(list) {
+            return list.toLowerCase() == (rcp.address || "").toLowerCase();
+        })
+        return !!matched;
     }
     var to_safetythird = (mail.to || []).find(contains_safetythird);
     var cc_safetythird = (mail.cc || []).find(contains_safetythird);
@@ -38,11 +42,12 @@ var handle_mail = function(mail, seqno, attributes) {
 mailListener.start();
 
 mailListener.on("server:connected", function() {
-    console.log("imapConnected");
+    console.log("imap connected");
+    console.log("listening for mail to following lists: " + constants.MAILING_LISTS);
 });
 
 mailListener.on("server:disconnected", function() {
-    console.log("imapDisconnected");
+    console.log("imap disconnected");
 });
 
 mailListener.on("error", function(err) {
