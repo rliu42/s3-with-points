@@ -3,7 +3,8 @@ var MailListener = require('mail-listener2'),
     constants = require('./constants'),
     logger = require('./logger')
 
-var mailListener = new MailListener({
+
+var options = {
     username: config.log_account.user,
     password: config.log_account.pass,
     host: "imap.gmail.com",
@@ -19,7 +20,13 @@ var mailListener = new MailListener({
     fetchUnreadOnStart: true, // use it only if you want to get all unread email on lib start. Default is `false`,
     mailParserOptions: { streamAttachments: false }, // options to be passed to mailParser lib.
     attachments: false, // download attachments as they are encountered to the project directory
-});
+}
+
+var mailListener = new MailListener(options);
+
+/*var options_sent = JSON.parse(JSON.stringify(options));
+options_sent.mailbox = "SENT";
+var mailListener_sent = new MailListener(options);*/
 
 var is_safetythird = function(mail) {
     var contains_safetythird = function(rcp) {
@@ -36,6 +43,14 @@ var is_safetythird = function(mail) {
 var handle_mail = function(mail, seqno, attributes) {
     if (is_safetythird(mail)) {
         logger.log_mail(mail);
+    } else {
+        console.log("Mail event not logged: ", {
+            subject: mail.subject,
+            from: mail.from,
+            to: mail.to,
+            cc: mail.cc,
+            text: mail.text
+        });
     }
 }
 
@@ -55,3 +70,12 @@ mailListener.on("error", function(err) {
 });
 
 mailListener.on("mail", handle_mail);
+
+/*mailListener_sent.start();
+mailListener_sent.on("error", function(err) {
+    console.log(err);
+});
+mailListener_sent.on("server:connected", function() {
+    console.log("imap_sent connected");
+});
+mailListener_sent.on("mail", handle_mail);*/
