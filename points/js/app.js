@@ -327,10 +327,10 @@ app.controller('MainController', function($scope, $http, $interval, $timeout, $w
                 );
                 for (var j = 1; j < month_diff; j++) {
                     var filler_date = moment(trend.timestamp).add(j, 'months').format("MMM YYYY");
-                    chart_data[1].push({ x: filler_date, y: 0 });
+                    chart_data[1].push({ x: filler_date, y: 0, ti: moment(trend.timestamp).add(j, 'months')});
                 }
-                chart_data[0].push({ x: current_date, y: 1 });
-                chart_data[1].push({ x: current_date, y: 1 });
+                chart_data[0].push({ x: current_date, y: 1, ti: trend.timestamp});
+                chart_data[1].push({ x: current_date, y: 1, ti: trend.timestamp});
                 return;
             }
             if (prev_date === current_date) {
@@ -342,15 +342,15 @@ app.controller('MainController', function($scope, $http, $interval, $timeout, $w
                 );
                 for (var j = 1; j < month_diff; j++) {
                     var filler_date = moment(trend.timestamp).add(j, 'months').format("MMM YYYY");
-                    chart_data[1].push({ x: filler_date, y: 0 });
+                    chart_data[1].push({ x: filler_date, y: 0, ti: moment(trend.timestamp).add(j, 'months')});
                 }
-                chart_data[0].push({ x: current_date, y: chart_data[0][chart_data[0].length - 1].y + 1 });
-                chart_data[1].push({ x: current_date, y: 1 });
+                chart_data[0].push({ x: current_date, y: chart_data[0][chart_data[0].length - 1].y + 1, ti: trend.timestamp});
+                chart_data[1].push({ x: current_date, y: 1, ti: trend.timestamp});
                 prev_date = current_date;
             }
         });
         chart_data[1].sort(function(a, b) {
-            return moment(a.x) - moment(b.x);
+            return moment(a.ti) - moment(b.ti);
         });
         $scope.chart_data = chart_data[1];
     }
@@ -366,8 +366,10 @@ app.controller('MainController', function($scope, $http, $interval, $timeout, $w
     }
 
     $scope.saveClassYear = function(row) {
-        $http.post('/api/class_year', row).success(function(data) {
-            loadMetadata(aggregateClassYears);
+        $http.post(getResourcePath('/class_year'), row).success(function(data) {
+            loadMetadata(function() {
+                aggregateClassYears($scope.leaderboard);
+            });
         });
     }
 

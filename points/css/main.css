@@ -52,6 +52,11 @@ th {
     background-color: #ccc;
 }
 
+.penalty {
+    color: #eee;
+    background-color: #ff6666;
+}
+
 .left {
     position: absolute;
     top: 12;

@@ -7,10 +7,11 @@
     <link rel="stylesheet" type="text/css" href="css/main.css" media="screen">
     <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.0/angular-material.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
-    <script src="https://momentjs.com/downloads/moment.js"></script>
-    <script src="https://momentjs.com/downloads/moment-timezone.js"></script>
-    <script src="https://momentjs.com/downloads/moment-timezone-with-data-2012-2022.js"></script>
+    <script src="lib/moment.js"></script>
+    <script src="lib/moment-timezone.js"></script>
+    <script src="lib/moment-timezone-with-data-2012-2022.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.5/angular-sanitize.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-animate.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-aria.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-messages.min.js"></script>
@@ -56,7 +57,7 @@
     </form>
     <small>(other aliases of <b><i>safetythird@mit.edu</i></b> are not yet counted)</small>
     <p><b>+1 bonus point</b> for each additional email in a thread after yours</p>
-    <p><b>-1 penalty</b> if email contains any of these words: <i>TBD</i></p>
+    <p style="max-width:50%; line-height:1.4"><b>-1 penalty/distinct word</b> if thread contains any of these words: <small style="font-size:70%"><i ng-repeat="word in configs.penalty_words"> {{word}}<span ng-if="!$last">,</span></i></small></p>
     <p ng-if="leaderboard">&nbsp;<b>Class Year</b> totals</p>
     <table id="class_totals" ng-if="leaderboard">
         <thead>
@@ -129,9 +130,11 @@
             </canvas>
         </section>
         <div class="email-listing">
-            <h3 ng-show="selected.user">{{filter_user_mail.length}} email{{filter_user_mail.length == 1 ? "" : "s"}} from <span style="background-color:#666; color:white; padding:4px; margin-bottom:6px">{{selected.user}}</span> <small> to selected list(s)<br>(participated in {{filterMailSubjects.length}} thread{{filterMailSubjects.length == 1 ? "" : "s"}})</small></h3>
+            <h3 ng-show="selected.user" style="line-height:1.33">{{filter_user_mail.length}} email{{filter_user_mail.length == 1 ? "" : "s"}} from <span style="background-color:#666; color:white; padding:4px; margin-bottom:6px">{{selected.user}}</span> <small> to selected list(s)<br>(participated in {{filterMailSubjects.length}} thread{{filterMailSubjects.length == 1 ? "" : "s"}})</small></h3>
             <li ng-repeat="item in filterMailSubjects | limitTo: 100 | orderBy: '-timestamp'" class="mail-item">
-                {{item.subject}} <small class="timestamp">{{item.timestamp | date: 'M/dd/yyyy @ h:mma' }}</small>
+                {{item.subject}} 
+                <small class="timestamp">&nbsp;{{item.timestamp | date: 'M/dd/yyyy @ h:mma' }}&nbsp;</small> 
+                <small class="penalty" ng-if="item.penalty">&nbsp;penalty <span ng-if="item.penalty_words.length"> <i>-{{item.penalty_words.length}}</i></span>&nbsp;</small>
             </li>
         </div>
     </div>
