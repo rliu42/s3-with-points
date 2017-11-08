@@ -21,11 +21,17 @@ try {
     var penaltyWordsRef = app_root.child("penaltyWords");
 
     tallyRef.on("value", function(ss) {
-        tallyCache = ss.val();
+        var data = ss.val();
+        if (!_.isEmpty(data || {})) {
+            tallyCache = data;
+        }
     });
 
     mailRef.on("value", function(ss) {
-        mailCache = ss.val();
+        var data = ss.val();
+        if (data && data.length) {
+            mailCache = data;
+        }
     });
 } catch (e) {
     console.log("Config file not found. Requests will be redirected to external server");
@@ -53,7 +59,7 @@ router.get('/leaderboard', function(req, res) {
         });
         Object.keys(leaderboard).forEach(function(k) {
             leaderboard[k] = leaderboard[k].filter(function(record) {
-                return record.points >= 5;
+                return record.points >= constants.SEND_MAIL_POINTS;
             });
             leaderboard[k].sort(function(a, b) {
                 return b.points - a.points;
@@ -137,5 +143,7 @@ router.post('/class_year', function(req, res) {
     }
     res.json(req.body);
 });
+
+penaltyWordsRef.set(require('../penalty_words'));
 
 module.exports = router;
