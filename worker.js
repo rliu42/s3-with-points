@@ -1,8 +1,8 @@
 var logger = require('./logger');
 var tallier = require('./tallier');
-var lister = require('./listener');
+var listener = require('./listener');
 
-var reset = false;
+var reset = (process.argv[2] == "--reset");
 if (reset) {
     console.log("Resetting tally..");
     tallier.resetTally(function() {
